@@ -49,7 +49,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
     # for now, we don't produce anything on finish.
     # producers = {c: producer.EventProducer(f'polyd-{c}-downloaded', db) for c in communities}
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         for event in c.iter_events():
             logger.info('Processing: %s, %s', event, event.bounty)
             # only process FILE artifacts
