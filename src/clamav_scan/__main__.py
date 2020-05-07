@@ -1,5 +1,4 @@
 import socket
-from concurrent.futures import ThreadPoolExecutor
 
 import click
 import requests
@@ -8,7 +7,7 @@ from walrus import Database
 
 from polyd_events import consumer, producer
 from polyd_events import communities as polyd_communities
-from . import logging, scan
+from . import logging, scan, thread
 
 
 @click.command()
@@ -49,10 +48,13 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
     # for now, we don't produce anything on finish.
     # producers = {c: producer.EventProducer(f'polyd-{c}-downloaded', db) for c in communities}
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        for event in c.iter_events():
-            logger.info('Processing: %s, %s', event, event.bounty)
+    executor = thread.BoundedExecutor(10, 4)
 
-            client = scan.get_client(access_key, secret_key, endpoint, region)
+    for event in c.iter_events():
+        logger.info('Processing: %s, %s', event, event.bounty)
 
-            executor.submit(scan.scan_event, event, client, clamav_host)
+        client = scan.get_client(access_key, secret_key, endpoint, region)
+
+        executor.submit(scan.scan_event, event, client, clamav_host)
+
+    executor.shutdown()
