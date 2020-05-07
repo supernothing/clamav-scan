@@ -52,9 +52,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
     with ThreadPoolExecutor(max_workers=4) as executor:
         for event in c.iter_events():
             logger.info('Processing: %s, %s', event, event.bounty)
-            # only process FILE artifacts
-            if event.bounty['data']['artifact_type'] != 'FILE':
-                continue
+
             client = scan.get_client(access_key, secret_key, endpoint, region)
-            bucket, key = event.path.split('/', 1)
-            executor.submit(scan.scan_s3, bucket, key, client, clamav_host)
+
+            executor.submit(scan.scan_event, event, client, clamav_host)
