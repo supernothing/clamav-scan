@@ -26,7 +26,7 @@ def scan_url(url, clamav_host, session=None):
 
 def scan_s3(bucket, key, client, clamav_host):
     try:
-        result = scan_obj(client.get_object(Bucket=bucket, key=key)['Body'], clamav_host)
+        result = scan_obj(client.get_object(Bucket=bucket, Key=key)['Body'], clamav_host)
         logger.info('Scan result: %s', result)
     except Exception as e:
         logger.exception('Scan failed: %s', e)
