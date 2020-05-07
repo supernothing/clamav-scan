@@ -57,4 +57,4 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
                 continue
             client = scan.get_client(access_key, secret_key, endpoint, region)
             bucket, key = event.path.split('/', 1)
-            executor.submit(scan.scan_s3. bucket, key, client, clamav_host)
+            executor.submit(scan.scan_s3, bucket, key, client, clamav_host)
