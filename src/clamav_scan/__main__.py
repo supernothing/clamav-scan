@@ -28,7 +28,7 @@ from . import logging, scan
 @click.option('--psd-key', type=click.STRING, envvar='PTS3_PSD_KEY', default='',
               help='PSD api key')
 @click.option('--clamav-host', type=click.STRING, envvar='PTS3_CLAMAV_HOST', default='',
-              help='PSD api key')
+              help='ClamAV host')
 @click.option('--quiet', '-q', is_flag=True, default=False)
 def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoint, region, psd_key, clamav_host, quiet):
     session = requests.Session()
@@ -53,7 +53,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
         for event in c.iter_events():
             logger.info('Processing: %s', event)
             # only process FILE artifacts
-            if event.artifact_type != 'FILE':
+            if event.bounty.artifact_type != 'FILE':
                 continue
             client = scan.get_client(access_key, secret_key, endpoint, region)
             bucket, key = event.path.split('/', 1)
