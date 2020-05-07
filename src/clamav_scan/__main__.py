@@ -28,8 +28,11 @@ from . import logging, scan, thread
               help='PSD api key')
 @click.option('--clamav-host', type=click.STRING, envvar='PTS3_CLAMAV_HOST', default='',
               help='ClamAV host')
+@click.option('--threads', type=click.INT, envvar='PTS3_THREADS', default=8,
+              help='Number of threads')
 @click.option('--quiet', '-q', is_flag=True, default=False)
-def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoint, region, psd_key, clamav_host, quiet):
+def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoint, region, psd_key, clamav_host,
+                threads, quiet):
     session = requests.Session()
     session.headers.update({'Authorization': psd_key})
     db = Database(redis)
@@ -48,7 +51,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
     # for now, we don't produce anything on finish.
     # producers = {c: producer.EventProducer(f'polyd-{c}-downloaded', db) for c in communities}
 
-    executor = thread.BoundedExecutor(10, 4)
+    executor = thread.BoundedExecutor(10, threads)
 
     for event in c.iter_events():
         logger.info('Processing: %s, %s', event, event.bounty)
