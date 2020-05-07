@@ -53,7 +53,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
         for event in c.iter_events():
             logger.info('Processing: %s', event)
             # only process FILE artifacts
-            if event.bounty.artifact_type != 'FILE':
+            if event.bounty['artifact_type'] != 'FILE':
                 continue
             client = scan.get_client(access_key, secret_key, endpoint, region)
             bucket, key = event.path.split('/', 1)
