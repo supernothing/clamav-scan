@@ -1,0 +1,6 @@
+git+git://github.com/supernothing/polyd-events@master#egg=polyd_events
+click~=7.1.2
+walrus~=0.8.1
+boto3~=1.13.4
+requests~=2.23.0
+clamd~=1.0.2
