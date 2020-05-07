@@ -14,19 +14,20 @@ def get_client(access_key, secret_key, endpoint, region):
 
 def scan_obj(file_obj, clamav_host):
     c = clamd.ClamdNetworkSocket(clamav_host)
-    c.instream(file_obj)
+    return c.instream(file_obj)
 
 
 def scan_url(url, clamav_host, session=None):
     session = session or requests.Session()
     with session.get(url, stream=True) as r:
         r.raise_for_status()
-        scan_obj(r.raw, clamav_host)
+        return scan_obj(r.raw, clamav_host)
 
 
 def scan_s3(bucket, key, client, clamav_host):
     try:
-        scan_obj(client.get_object(Bucket=bucket, key=key)['Body'], clamav_host)
+        result = scan_obj(client.get_object(Bucket=bucket, key=key)['Body'], clamav_host)
+        logger.info('Scan result: %s', result)
     except Exception as e:
         logger.exception('Scan failed: %s', e)
         raise e
