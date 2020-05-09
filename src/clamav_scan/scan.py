@@ -44,10 +44,10 @@ def scan_event(event, client, clamav_host, api, eth_key):
         verdict, family = result['stream']
         if 'verdict' == 'OK':
             verdict = False
-            metadata = {'malware_family': '', 'scanner':  {'version': 'acqcuire_nectar 0.69'}}
+            metadata = {'malware_family': '',  'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}
         else:
             verdict = True
-            metadata = {'malware_family': family, 'scanner': {'version': 'acqcuire_nectar 0.69'}}
+            metadata = {'malware_family': family, 'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}
 
         # lol improve once settles happen
         bid = 420000000000000000
