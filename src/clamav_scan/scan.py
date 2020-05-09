@@ -51,7 +51,7 @@ def scan_event(event, client, clamav_host, api, eth_key):
         result = scan_s3(bucket, key, client, clamav_host)
         logger.info('Scan result: %s', result)
         verdict, family = result['stream']
-        if 'verdict' == 'OK':
+        if verdict == 'OK':
             verdict = False
             metadata = json.dumps({'malware_family': '', 'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
         else:
