@@ -54,9 +54,9 @@ def scan_event(event, client, clamav_host, api, eth_key):
 
         guid = event.bounty['data']['guid']
         a = transaction.Assertion(guid, verdict, bid, metadata).sign(eth_key)
-        logger.info('Posting assertion: %s', a)
+        logger.info('Posting assertion: %s, %s', a, event.bounty['data']['sha256'])
         r = api.post_assertion(guid, a)
-        logger.info('Posted assertion: %s', a)
+        logger.info('Posted assertion: %s, %s', a, event.bounty['data']['sha256'])
         logger.info('Result: %s', r.json)
 
         event.ack()
