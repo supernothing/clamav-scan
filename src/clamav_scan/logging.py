@@ -8,7 +8,7 @@ logger = None
 def get_logger():
     global logger
     if not logger:
-        logger = logging.getLogger('polyd-to-s3')
+        logger = logging.getLogger('clamav-scan')
         handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)

@@ -3,10 +3,13 @@ import socket
 import click
 import requests
 
+from binascii import unhexlify
+
 from walrus import Database
 
 from polyd_events import consumer, producer
 from polyd_events import communities as polyd_communities
+from libpolyd import api
 from . import logging, scan, thread
 
 
@@ -26,13 +29,16 @@ from . import logging, scan, thread
               help='S3 bucket')
 @click.option('--psd-key', type=click.STRING, envvar='PTS3_PSD_KEY', default='',
               help='PSD api key')
+@click.option('--eth-key', type=click.STRING, envvar='PTS3_ETH_KEY', default='',
+              help='Hex ETH priv key')
 @click.option('--clamav-host', type=click.STRING, envvar='PTS3_CLAMAV_HOST', default='',
               help='ClamAV host')
 @click.option('--threads', type=click.INT, envvar='PTS3_THREADS', default=8,
               help='Number of threads')
 @click.option('--quiet', '-q', is_flag=True, default=False)
-def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoint, region, psd_key, clamav_host,
+def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoint, region, psd_key, eth_key, clamav_host,
                 threads, quiet):
+    eth_key = unhexlify(eth_key)
     session = requests.Session()
     session.headers.update({'Authorization': psd_key})
     db = Database(redis)
@@ -43,6 +49,8 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
     c = consumer.EventConsumer(streams, 'clamav_scan', consumer_name, db)
 
     logger = logging.get_logger()
+
+    psd_api = api.PolydAPI(psd_key)
 
     if quiet:
         import logging as l

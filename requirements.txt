@@ -1,4 +1,5 @@
 git+git://github.com/supernothing/polyd-events@master#egg=polyd_events
+git+git://github.com/supernothing/libpolyd@master#egg=libpolyd
 click~=7.1.2
 walrus~=0.8.1
 boto3~=1.13.4
