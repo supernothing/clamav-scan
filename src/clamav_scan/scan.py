@@ -3,7 +3,7 @@ import clamd
 import requests
 import json
 
-from libpolyd import transaction, api
+from libpolyd import transaction, api, exceptions
 
 from . import logging
 
@@ -45,7 +45,7 @@ def calculate_bid(verdict, family):
 
 
 # TODO in the future, this should collect from multiple engines
-def scan_event(event, client, clamav_host, api, eth_key):
+def scan_event(event, client, clamav_host, api, eth_key, cg):
     try:
         bucket, key = event.path.split('/', 1)
         result = scan_s3(bucket, key, client, clamav_host)
@@ -64,7 +64,14 @@ def scan_event(event, client, clamav_host, api, eth_key):
         guid = event.bounty['data']['guid']
         a = transaction.Assertion(guid, verdict, bid, metadata).sign(eth_key)
         logger.info('Posting assertion: %s, %s', a, event.bounty)
-        r = api.post_assertion(guid, a)
+
+        try:
+            r = api.post_assertion(guid, a)
+        except exceptions.PolydException as e:
+            logger.exception('Failed to post assertion, likely because of expired bounty. Jumping forward in consumer: %s', e)
+            cg.set_id('$')
+            return None, event
+
         logger.info('Posted assertion: %s, %s', a, event.bounty)
         logger.info('Result: %s', r.json)
 
