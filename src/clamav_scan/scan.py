@@ -38,7 +38,7 @@ def scan_s3(bucket, key, client, clamav_host):
 
 def calculate_bid(verdict, family):
     # TODO
-    return 42000000000000000000
+    return 4200000000000000000
 
 # TODO in the future, this should collect from multiple engines
 def scan_event(event, client, clamav_host, api, eth_key):
