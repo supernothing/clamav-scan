@@ -46,7 +46,7 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
 
     streams = [f'polyd-{c}-downloaded' for c in communities]
 
-    c = consumer.EventConsumer(streams, 'clamav_scan', consumer_name, db)
+    c = consumer.EventConsumer(streams, 'clamav_scan', consumer_name, db, consume_from_end=True)
 
     logger = logging.get_logger()
 
