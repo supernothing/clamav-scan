@@ -1,6 +1,7 @@
 import boto3
 import clamd
 import requests
+import json
 
 from libpolyd import transaction, api
 
@@ -44,10 +45,10 @@ def scan_event(event, client, clamav_host, api, eth_key):
         verdict, family = result['stream']
         if 'verdict' == 'OK':
             verdict = False
-            metadata = {'malware_family': ''}
+            metadata = json.dumps({'malware_family': ''})
         else:
             verdict = True
-            metadata = {'malware_family': family}
+            metadata = json.dumps({'malware_family': family})
 
         # lol improve once settles happen
         bid = 420000000000000000
