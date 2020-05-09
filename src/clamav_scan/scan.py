@@ -36,6 +36,10 @@ def scan_s3(bucket, key, client, clamav_host):
     return result
 
 
+def calculate_bid(verdict, family):
+    # TODO
+    return 42000000000000000000
+
 # TODO in the future, this should collect from multiple engines
 def scan_event(event, client, clamav_host, api, eth_key):
     try:
@@ -45,13 +49,13 @@ def scan_event(event, client, clamav_host, api, eth_key):
         verdict, family = result['stream']
         if 'verdict' == 'OK':
             verdict = False
-            metadata = json.dumps({'malware_family': ''})
+            metadata = json.dumps({'malware_family': '', 'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
         else:
             verdict = True
-            metadata = json.dumps({'malware_family': family})
+            metadata = json.dumps({'malware_family': family, 'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
 
         # lol improve once settles happen
-        bid = 420000000000000000
+        bid = calculate_bid(verdict, family)
 
         guid = event.bounty['data']['guid']
         a = transaction.Assertion(guid, verdict, bid, metadata).sign(eth_key)
