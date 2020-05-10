@@ -66,6 +66,6 @@ def clamav_scan(community, redis, consumer_name, access_key, secret_key, endpoin
 
         client = scan.get_client(access_key, secret_key, endpoint, region)
 
-        executor.submit(scan.scan_event, event, client, clamav_host, psd_api, eth_key)
+        executor.submit(scan.scan_event, event, client, clamav_host, psd_api, eth_key, c)
 
     executor.shutdown()
