@@ -45,7 +45,7 @@ def calculate_bid(verdict, family):
 
 
 # TODO in the future, this should collect from multiple engines
-def scan_event(event, client, clamav_host, api, eth_key, cg):
+def scan_event(event, client, clamav_host, api, eth_key, consumer):
     try:
         bucket, key = event.path.split('/', 1)
         result = scan_s3(bucket, key, client, clamav_host)
@@ -69,7 +69,7 @@ def scan_event(event, client, clamav_host, api, eth_key, cg):
             r = api.post_assertion(guid, a)
         except exceptions.PolydException as e:
             logger.exception('Failed to post assertion, likely because of expired bounty. Jumping forward in consumer: %s', e)
-            cg.set_id('$')
+            consumer.cg.set_id('$')
             return None, event
 
         logger.info('Posted assertion: %s, %s', a, event.bounty)
