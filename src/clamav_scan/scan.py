@@ -52,6 +52,7 @@ def scan_event(event, client, clamav_host, api, eth_key, consumer):
         logger.info('Scan result: %s', result)
 
         if not result:
+            event.ack()
             return (None, None), event
 
         verdict, family = result['stream']
