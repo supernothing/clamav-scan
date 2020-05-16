@@ -50,6 +50,10 @@ def scan_event(event, client, clamav_host, api, eth_key, consumer):
         bucket, key = event.path.split('/', 1)
         result = scan_s3(bucket, key, client, clamav_host)
         logger.info('Scan result: %s', result)
+
+        if not result:
+            return (None, None), event
+
         verdict, family = result['stream']
         if verdict == 'OK':
             verdict = False
