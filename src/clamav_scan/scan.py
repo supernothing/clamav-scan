@@ -1,7 +1,7 @@
 import boto3
-import clamd
 import requests
 import json
+import uuid
 
 from libpolyd import transaction, api, exceptions
 
@@ -15,9 +15,11 @@ def get_client(access_key, secret_key, endpoint, region):
     return session.client('s3', endpoint_url=endpoint)
 
 
-def scan_obj(file_obj, clamav_host):
-    c = clamd.ClamdNetworkSocket(clamav_host)
-    return c.instream(file_obj)
+def scan_obj(file_obj, clamav_host, session=None):
+    session = session or requests.Session()
+    with session.post(f'http://{clamav_host}:8000/file/scan', files={'file': (str(uuid.uuid4()), file_obj)}) as r:
+        r.raise_for_status()
+        return r.json()
 
 
 def scan_url(url, clamav_host, session=None):
@@ -53,15 +55,15 @@ def scan_event(event, client, clamav_host, api, eth_key, consumer):
 
         if not result:
             event.ack()
-            return (None, None), event
+            return {}, event
 
-        verdict, family = result['stream']
-        if verdict == 'OK':
-            verdict = False
-            metadata = json.dumps({'malware_family': '', 'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
-        else:
-            verdict = True
-            metadata = json.dumps({'malware_family': family, 'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
+        verdict, family = result['malicious'], result['result']
+
+        if family == 'clean':
+            family = ''
+
+        metadata = json.dumps({'malware_family': family,
+                               'scanner': {'vendor_version': 'acqcuire_nectar 0.6.9', 'version': '0.6.9'}})
 
         # lol improve once settles happen
         bid = calculate_bid(verdict, family)
